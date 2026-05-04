@@ -40,7 +40,8 @@ export default async function CheckoutPage() {
     email: user.primaryEmailAddress?.emailAddress || ""
   };
 
-  const shopifyToken = cookieStore.get("shopify_customer_token")?.value;
+  // Use the token from the cookie, or the one just returned from the sync result
+  const shopifyToken = cookieStore.get("shopify_customer_token")?.value || syncResult.accessToken;
   if (shopifyToken) {
     buyerIdentity.customerAccessToken = shopifyToken;
     console.log(`[Checkout] Attaching customer access token to cart.`);
@@ -67,9 +68,9 @@ export default async function CheckoutPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center space-y-4 bg-background">
+      <meta httpEquiv="refresh" content="3;url=/products" />
       <Loader2 className="h-12 w-12 animate-spin text-primary" />
       <p className="text-lg font-medium text-foreground">Something went wrong. Redirecting to products...</p>
-      <script dangerouslySetInnerHTML={{ __html: 'setTimeout(() => window.location.href = "/products", 3000)' }} />
     </div>
   );
 }

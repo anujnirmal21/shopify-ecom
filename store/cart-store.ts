@@ -6,10 +6,12 @@ import {
   removeFromCart,
   getCart,
   updateCartLine,
+  ShopifyCart,
+  ShopifyCartLine,
 } from "../lib/shopify";
 
 interface CartState {
-  cart: any;
+  cart: ShopifyCart | null;
   isCartOpen: boolean;
   cartId: string | null;
   setIsCartOpen: (open: boolean) => void;
@@ -47,13 +49,13 @@ export const useCartStore = create<CartState>()(
         if (currentCartId) {
           const cart = get().cart;
           const existingLine = cart?.lines?.nodes?.find(
-            (line: any) => line.merchandise.id === variantId,
+            (line: ShopifyCartLine) => line.merchandise.id === variantId,
           );
 
-          if (existingLine) {
+          if (existingLine && cart) {
             // Optimistic update for existing item
             const newQuantity = existingLine.quantity + quantity;
-            const updatedNodes = cart.lines.nodes.map((line: any) =>
+            const updatedNodes = cart.lines.nodes.map((line: ShopifyCartLine) =>
               line.id === existingLine.id
                 ? { ...line, quantity: newQuantity }
                 : line,
@@ -80,7 +82,7 @@ export const useCartStore = create<CartState>()(
 
         // Optimistic remove
         const updatedNodes = cart.lines.nodes.filter(
-          (line: any) => line.id !== lineId,
+          (line: ShopifyCartLine) => line.id !== lineId,
         );
         set({
           cart: { ...cart, lines: { ...cart.lines, nodes: updatedNodes } },
@@ -101,7 +103,7 @@ export const useCartStore = create<CartState>()(
         }
 
         // Optimistic update
-        const updatedNodes = cart.lines.nodes.map((line: any) =>
+        const updatedNodes = cart.lines.nodes.map((line: ShopifyCartLine) =>
           line.id === lineId ? { ...line, quantity } : line,
         );
         set({

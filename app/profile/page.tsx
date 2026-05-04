@@ -1,11 +1,10 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { syncWithShopify } from "@/lib/auth-sync";
-import { getShopifyCustomer } from "@/lib/shopify";
+import { getShopifyCustomer, ShopifyOrder } from "@/lib/shopify";
 import { cookies } from "next/headers";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import {
-  User,
   ShieldCheck,
   Mail,
   Database,
@@ -32,7 +31,9 @@ export default async function ProfilePage() {
   });
 
   const cookieStore = await cookies();
-  const shopifyToken = cookieStore.get("shopify_customer_token")?.value;
+  // Use the token from the cookie, or the one just returned from the sync result
+  const shopifyToken =
+    cookieStore.get("shopify_customer_token")?.value || syncResult.accessToken;
 
   let shopifyCustomer = null;
   if (shopifyToken) {
@@ -40,15 +41,14 @@ export default async function ProfilePage() {
 
     // If token is invalid/expired, re-sync once
     if (!shopifyCustomer) {
-      await syncWithShopify({
+      const retrySync = await syncWithShopify({
         id: user.id,
         email: user.primaryEmailAddress?.emailAddress || "",
         firstName: user.firstName || undefined,
         lastName: user.lastName || undefined,
       });
-      const newToken = cookieStore.get("shopify_customer_token")?.value;
-      if (newToken) {
-        shopifyCustomer = await getShopifyCustomer(newToken);
+      if (retrySync.accessToken) {
+        shopifyCustomer = await getShopifyCustomer(retrySync.accessToken);
       }
     }
   }
@@ -157,6 +157,17 @@ export default async function ProfilePage() {
                       </span>
                     </div>
                   </div>
+                ) : syncResult.error ? (
+                  <div className="space-y-4">
+                    <div className="rounded-lg bg-destructive/10 p-4 border border-destructive/20 text-center">
+                      <p className="text-xs font-bold text-destructive uppercase mb-2">
+                        Sync Error
+                      </p>
+                      <p className="text-xs text-destructive leading-relaxed">
+                        {syncResult.error}
+                      </p>
+                    </div>
+                  </div>
                 ) : (
                   <div className="animate-pulse space-y-3">
                     <div className="h-4 bg-muted rounded w-full"></div>
@@ -182,7 +193,7 @@ export default async function ProfilePage() {
 
               <div className="divide-y divide-border">
                 {orders.length > 0 ? (
-                  orders.map(({ node: order }: any) => (
+                  orders.map(({ node: order }: { node: ShopifyOrder }) => (
                     <div
                       key={order.id}
                       className="p-6 hover:bg-muted/30 transition-colors group"
@@ -225,7 +236,7 @@ export default async function ProfilePage() {
                       {/* Line Items Preview */}
                       <div className="mt-4 flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
                         {order.lineItems.edges.map(
-                          ({ node: item }: any, idx: number) => (
+                          ({ node: item }, idx: number) => (
                             <div key={idx} className="flex-shrink-0 relative">
                               <div className="h-14 w-14 rounded-lg border border-border overflow-hidden bg-muted">
                                 {item.variant?.image ? (
@@ -270,7 +281,10 @@ export default async function ProfilePage() {
                 ) : (
                   <div className="flex flex-col items-center justify-center py-24 text-center px-6">
                     <div className="rounded-full bg-muted p-6 mb-4">
-                      <ShoppingBag size={48} className="text-muted-foreground" />
+                      <ShoppingBag
+                        size={48}
+                        className="text-muted-foreground"
+                      />
                     </div>
                     <h4 className="text-xl font-bold text-foreground">
                       No orders yet
@@ -295,3 +309,4 @@ export default async function ProfilePage() {
     </div>
   );
 }
+

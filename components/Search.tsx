@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search as SearchIcon, X, Loader2 } from 'lucide-react';
-import { searchProducts } from '@/lib/shopify';
+import { searchProducts, ShopifyProduct } from '@/lib/shopify';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Search() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<ShopifyProduct[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();

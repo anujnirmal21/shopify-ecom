@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { ShopifyProduct } from '../lib/shopify';
 
 interface WishlistState {
-  wishlist: any[];
-  toggleWishlist: (product: any) => void;
+  wishlist: ShopifyProduct[];
+  toggleWishlist: (product: ShopifyProduct) => void;
   isInWishlist: (productId: string) => boolean;
 }
 

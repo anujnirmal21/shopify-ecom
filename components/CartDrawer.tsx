@@ -5,6 +5,7 @@ import { useCartStore } from '../store/cart-store';
 import CartItem from './CartItem';
 import { X, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
+import { ShopifyCartLine } from '@/lib/shopify';
 
 export default function CartDrawer() {
   const { cart, isCartOpen, setIsCartOpen, cartId } = useCartStore();
@@ -65,7 +66,7 @@ export default function CartDrawer() {
                 </div>
               ) : (
                 <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-800">
-                  {lines.map((line: any) => (
+                  {lines.map((line: ShopifyCartLine) => (
                     <CartItem key={line.id} line={line} />
                   ))}
                 </ul>

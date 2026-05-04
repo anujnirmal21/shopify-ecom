@@ -22,8 +22,8 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
           <div className="flex flex-shrink-0 items-center">
-            <Link href="/" className="group flex items-center space-x-2">
-              <div className="rounded-lg bg-primary p-1.5 text-primary-foreground transition-transform group-hover:rotate-12 shadow-sm shadow-primary/20">
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="rounded-lg bg-primary p-1.5 text-primary-foreground transition-transform shadow-sm shadow-primary/20">
                 <ShoppingBag size={20} />
               </div>
               <span className="text-xl font-bold tracking-tight text-foreground">

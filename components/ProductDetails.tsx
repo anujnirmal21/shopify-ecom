@@ -3,38 +3,19 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useCartStore } from '../store/cart-store';
+import { ShopifyProduct, ShopifyProductVariant } from '@/lib/shopify';
 
 interface ProductDetailsProps {
-  product: {
-    id: string;
-    title: string;
-    description: string;
-    descriptionHtml: string;
-    images: {
-      nodes: Array<{
-        url: string;
-        altText: string;
-        width: number;
-        height: number;
-      }>;
-    };
-    variants: {
-      nodes: Array<{
-        id: string;
-        title: string;
-        price: {
-          amount: string;
-          currencyCode: string;
-        };
-        availableForSale: boolean;
-      }>;
-    };
-  };
+  product: ShopifyProduct;
 }
 
 export default function ProductDetails({ product }: ProductDetailsProps) {
-  const [selectedVariant, setSelectedVariant] = useState(product.variants.nodes[0]);
-  const [selectedImage, setSelectedImage] = useState(product.images.nodes[0]);
+  const [selectedVariant, setSelectedVariant] = useState<ShopifyProductVariant | undefined>(
+    product.variants.nodes[0]
+  );
+  const [selectedImage, setSelectedImage] = useState(
+    product.images?.nodes[0] || product.featuredImage
+  );
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCartStore();
   const [isAdding, setIsAdding] = useState(false);
@@ -57,6 +38,8 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     currency: selectedVariant?.price.currencyCode || 'USD',
   }).format(parseFloat(selectedVariant?.price.amount || '0'));
 
+  const images = product.images?.nodes || (product.featuredImage ? [product.featuredImage] : []);
+
   return (
     <div className="bg-white dark:bg-gray-950 transition-colors duration-300">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
@@ -65,7 +48,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
           <div className="flex flex-col-reverse">
             <div className="mx-auto mt-6 hidden w-full max-w-2xl sm:block lg:max-w-none">
               <div className="grid grid-cols-4 gap-6" aria-orientation="horizontal" role="tablist">
-                {product.images.nodes.map((image, index) => (
+                {images.map((image, index) => (
                   <button
                     key={index}
                     className="relative flex h-24 cursor-pointer items-center justify-center rounded-md bg-white dark:bg-gray-900 text-sm font-medium uppercase text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring focus:ring-opacity-50 focus:ring-offset-4"
@@ -82,7 +65,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                     </span>
                     <span
                       className={`${
-                        selectedImage.url === image.url ? 'ring-indigo-500' : 'ring-transparent'
+                        selectedImage?.url === image.url ? 'ring-indigo-500' : 'ring-transparent'
                       } pointer-events-none absolute inset-0 rounded-md ring-2 ring-offset-2`}
                       aria-hidden="true"
                     />
@@ -93,13 +76,15 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
             <div className="aspect-h-1 aspect-w-1 w-full">
               <div className="relative h-[500px] w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-900">
-                <Image
-                  src={selectedImage.url}
-                  alt={selectedImage.altText || product.title}
-                  fill
-                  className="h-full w-full object-cover object-center"
-                  priority
-                />
+                {selectedImage && (
+                  <Image
+                    src={selectedImage.url}
+                    alt={selectedImage.altText || product.title}
+                    fill
+                    className="h-full w-full object-cover object-center"
+                    priority
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -117,7 +102,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               <h3 className="sr-only">Description</h3>
               <div
                 className="space-y-6 text-base text-gray-700 dark:text-gray-300"
-                dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
+                dangerouslySetInnerHTML={{ __html: product.descriptionHtml || product.description || '' }}
               />
             </div>
 
@@ -133,7 +118,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                         onClick={() => setSelectedVariant(variant)}
                         disabled={!variant.availableForSale}
                         className={`${
-                          selectedVariant.id === variant.id
+                          selectedVariant?.id === variant.id
                             ? 'bg-indigo-600 text-white border-transparent'
                             : 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-800'
                         } ${

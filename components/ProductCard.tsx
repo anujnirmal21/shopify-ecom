@@ -6,26 +6,10 @@ import Link from "next/link";
 import { useCartStore } from "../store/cart-store";
 import { useWishlistStore } from "../store/wishlist-store";
 import { Heart, ShoppingCart } from "lucide-react";
+import { ShopifyProduct } from "../lib/shopify";
 
 interface ProductCardProps {
-  product: {
-    id: string;
-    title: string;
-    handle: string;
-    featuredImage?: {
-      url: string;
-      altText: string;
-    };
-    priceRange: {
-      minVariantPrice: {
-        amount: string;
-        currencyCode: string;
-      };
-    };
-    variants: {
-      nodes: Array<{ id: string }>;
-    };
-  };
+  product: ShopifyProduct;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {

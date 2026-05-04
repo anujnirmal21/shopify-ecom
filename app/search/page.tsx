@@ -2,14 +2,14 @@
 
 import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { searchProducts } from '@/lib/shopify';
+import { searchProducts, ShopifyProduct } from '@/lib/shopify';
 import ProductCard from '@/components/ProductCard';
 import { Search as SearchIcon, Loader2 } from 'lucide-react';
 
 function SearchResults() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [results, setResults] = React.useState<any[]>([]);
+  const [results, setResults] = React.useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {

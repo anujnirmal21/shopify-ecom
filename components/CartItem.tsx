@@ -4,28 +4,10 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useCartStore } from '../store/cart-store';
 import { Trash2, Plus, Minus } from 'lucide-react';
+import { ShopifyCartLine } from '@/lib/shopify';
 
 interface CartItemProps {
-  line: {
-    id: string;
-    quantity: number;
-    merchandise: {
-      id: string;
-      title: string;
-      price: {
-        amount: string;
-        currencyCode: string;
-      };
-      product: {
-        title: string;
-        handle: string;
-        featuredImage: {
-          url: string;
-          altText: string;
-        };
-      };
-    };
-  };
+  line: ShopifyCartLine;
 }
 
 export default function CartItem({ line }: CartItemProps) {
