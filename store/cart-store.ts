@@ -1,0 +1,135 @@
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import {
+  createCart,
+  addToCart,
+  removeFromCart,
+  getCart,
+  updateCartLine,
+} from "../lib/shopify";
+
+interface CartState {
+  cart: any;
+  isCartOpen: boolean;
+  cartId: string | null;
+  setIsCartOpen: (open: boolean) => void;
+  addItem: (variantId: string, quantity?: number) => Promise<void>;
+  removeItem: (lineId: string) => Promise<void>;
+  updateQuantity: (lineId: string, quantity: number) => Promise<void>;
+  refreshCart: () => Promise<void>;
+  checkout: () => void;
+}
+
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
+      cart: null,
+      isCartOpen: false,
+      cartId: null,
+      setIsCartOpen: (open) => set({ isCartOpen: open }),
+
+      checkout: () => {
+        const cart = get().cart;
+        if (cart?.checkoutUrl) {
+          window.location.href = cart.checkoutUrl;
+        }
+      },
+
+      addItem: async (variantId: string, quantity: number = 1) => {
+        let currentCartId = get().cartId;
+        if (!currentCartId) {
+          const newCart = await createCart();
+          currentCartId = newCart.id;
+          document.cookie = `cartId=${currentCartId}; path=/; max-age=31536000; SameSite=Lax`;
+          set({ cartId: currentCartId, cart: newCart });
+        }
+
+        if (currentCartId) {
+          const cart = get().cart;
+          const existingLine = cart?.lines?.nodes?.find(
+            (line: any) => line.merchandise.id === variantId,
+          );
+
+          if (existingLine) {
+            // Optimistic update for existing item
+            const newQuantity = existingLine.quantity + quantity;
+            const updatedNodes = cart.lines.nodes.map((line: any) =>
+              line.id === existingLine.id
+                ? { ...line, quantity: newQuantity }
+                : line,
+            );
+            set({
+              cart: { ...cart, lines: { ...cart.lines, nodes: updatedNodes } },
+              isCartOpen: true,
+            });
+
+            await updateCartLine(currentCartId, existingLine.id, newQuantity);
+          } else {
+            // Add new line
+            await addToCart(currentCartId, variantId, quantity);
+            set({ isCartOpen: true });
+          }
+          await get().refreshCart();
+        }
+      },
+
+      removeItem: async (lineId: string) => {
+        const currentCartId = get().cartId;
+        const cart = get().cart;
+        if (!currentCartId || !cart) return;
+
+        // Optimistic remove
+        const updatedNodes = cart.lines.nodes.filter(
+          (line: any) => line.id !== lineId,
+        );
+        set({
+          cart: { ...cart, lines: { ...cart.lines, nodes: updatedNodes } },
+        });
+
+        await removeFromCart(currentCartId, lineId);
+        await get().refreshCart();
+      },
+
+      updateQuantity: async (lineId: string, quantity: number) => {
+        const currentCartId = get().cartId;
+        const cart = get().cart;
+        if (!currentCartId || !cart) return;
+
+        if (quantity < 1) {
+          await get().removeItem(lineId);
+          return;
+        }
+
+        // Optimistic update
+        const updatedNodes = cart.lines.nodes.map((line: any) =>
+          line.id === lineId ? { ...line, quantity } : line,
+        );
+        set({
+          cart: { ...cart, lines: { ...cart.lines, nodes: updatedNodes } },
+        });
+
+        await updateCartLine(currentCartId, lineId, quantity);
+        await get().refreshCart();
+      },
+
+      refreshCart: async () => {
+        const currentCartId = get().cartId;
+        if (!currentCartId) return;
+        try {
+          const data = await getCart(currentCartId);
+          if (data) {
+            set({ cart: data });
+          } else {
+            set({ cartId: null, cart: null });
+          }
+        } catch (error) {
+          console.error("Failed to refresh cart:", error);
+        }
+      },
+    }),
+    {
+      name: "cart-storage",
+      partialize: (state) => ({ cartId: state.cartId }),
+    },
+  ),
+);
