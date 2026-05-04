@@ -95,10 +95,6 @@ export default function Navbar() {
                 </div>
               </Show>
             </div>
-
-            <button className="sm:hidden rounded-full p-2 text-muted-foreground hover:bg-accent transition-colors">
-              <Menu size={22} className=" cursor-pointer" />
-            </button>
           </div>
         </div>
       </div>
