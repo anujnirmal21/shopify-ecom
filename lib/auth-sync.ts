@@ -1,12 +1,12 @@
 "use server";
 
-import {
-  createShopifyCustomer,
-  createShopifyCustomerAdmin,
-  createCustomerAccessToken,
-} from "./shopify";
 import { cookies } from "next/headers";
 import { createHash } from "crypto";
+import {
+  createCustomerAccessToken,
+  createShopifyCustomerAdmin,
+  createShopifyCustomer,
+} from "@/services/customer";
 
 const SHOPIFY_PASSWORD_SALT =
   process.env.SHOPIFY_PASSWORD_SALT || "default_salt_for_dev_only";

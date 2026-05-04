@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useCartStore } from "../store/cart-store";
 import { useWishlistStore } from "../store/wishlist-store";
 import { Heart, ShoppingCart } from "lucide-react";
-import { ShopifyProduct } from "../lib/shopify";
+import { ShopifyProduct } from "@/lib/types";
 
 interface ProductCardProps {
   product: ShopifyProduct;
@@ -80,7 +80,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="mt-auto flex items-center justify-between">
-          <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{formattedPrice}</p>
+          <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            {formattedPrice}
+          </p>
           <button
             onClick={handleAddToCart}
             className="p-2.5 rounded-lg bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer"

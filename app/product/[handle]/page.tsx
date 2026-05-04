@@ -1,6 +1,6 @@
-import { getProductByHandle } from '@/lib/shopify';
-import ProductDetails from '@/components/ProductDetails';
-import { notFound } from 'next/navigation';
+import ProductDetails from "@/components/ProductDetails";
+import { getProductByHandle } from "@/services/product";
+import { notFound } from "next/navigation";
 
 interface ProductPageProps {
   params: Promise<{ handle: string }>;
@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
   if (!product) {
     return {
-      title: 'Product Not Found',
+      title: "Product Not Found",
     };
   }
 

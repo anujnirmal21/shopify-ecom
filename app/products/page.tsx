@@ -1,17 +1,24 @@
 import ProductCard from "@/components/ProductCard";
-import { getProducts, getCollections, getCollectionProducts } from "@/lib/shopify";
+import {
+  getCollections,
+  getCollectionProducts,
+  getProducts,
+} from "@/services/product";
+
 import Link from "next/link";
 
 interface ProductsPageProps {
   searchParams: Promise<{ collection?: string }>;
 }
 
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+export default async function ProductsPage({
+  searchParams,
+}: ProductsPageProps) {
   const { collection: collectionHandle } = await searchParams;
-  
+
   let products;
   let title = "All Products";
-  
+
   const collections = await getCollections();
 
   if (collectionHandle) {
@@ -34,15 +41,15 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               Showing {products.length} products
             </p>
           </div>
-          
+
           {/* Collection Filter Buttons */}
           <div className="mt-6 flex flex-wrap gap-2 md:mt-0">
             <Link
               href="/products"
               className={`rounded-full px-4 py-2 text-xs font-semibold transition-all ${
-                !collectionHandle 
-                  ? 'bg-primary text-primary-foreground shadow-md' 
-                  : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                !collectionHandle
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               }`}
             >
               All
@@ -52,9 +59,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 key={col.id}
                 href={`/products?collection=${col.handle}`}
                 className={`rounded-full px-4 py-2 text-xs font-semibold transition-all ${
-                  collectionHandle === col.handle 
-                    ? 'bg-primary text-primary-foreground shadow-md' 
-                    : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  collectionHandle === col.handle
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 }`}
               >
                 {col.title}
@@ -65,7 +72,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
         {products.length === 0 ? (
           <div className="py-24 text-center">
-            <p className="text-muted-foreground text-lg">No products found in this collection.</p>
+            <p className="text-muted-foreground text-lg">
+              No products found in this collection.
+            </p>
           </div>
         ) : (
           <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

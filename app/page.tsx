@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getProducts, getCollections } from "@/lib/shopify";
 import ProductCard from "@/components/ProductCard";
 import { ArrowRight, Sparkles, TrendingUp, Package } from "lucide-react";
+import { getProducts, getCollections } from "@/services/product";
 
 export default async function HomePage() {
   const [products, collections] = await Promise.all([

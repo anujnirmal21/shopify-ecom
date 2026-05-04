@@ -1,6 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { syncWithShopify } from "@/lib/auth-sync";
-import { getShopifyCustomer, ShopifyOrder } from "@/lib/shopify";
+
 import { cookies } from "next/headers";
 import Image from "next/image";
 import { redirect } from "next/navigation";
@@ -14,6 +14,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
+import { ShopifyOrder } from "@/lib/types";
+import { getShopifyCustomer } from "@/services/customer";
 
 export default async function ProfilePage() {
   const user = await currentUser();
@@ -309,4 +311,3 @@ export default async function ProfilePage() {
     </div>
   );
 }
-

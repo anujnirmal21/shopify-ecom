@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useCartStore } from '../store/cart-store';
-import CartItem from './CartItem';
-import { X, ShoppingBag } from 'lucide-react';
-import Link from 'next/link';
-import { ShopifyCartLine } from '@/lib/shopify';
+import React from "react";
+import { useCartStore } from "../store/cart-store";
+import CartItem from "./CartItem";
+import { X, ShoppingBag } from "lucide-react";
+import Link from "next/link";
+import { ShopifyCartLine } from "@/lib/types";
 
 export default function CartDrawer() {
   const { cart, isCartOpen, setIsCartOpen, cartId } = useCartStore();
@@ -37,7 +37,9 @@ export default function CartDrawer() {
             <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-6 sm:px-6">
               <div className="flex items-center space-x-2">
                 <ShoppingBag className="text-indigo-600 dark:text-indigo-400" />
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Shopping Cart</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Shopping Cart
+                </h2>
               </div>
               <button
                 type="button"
@@ -53,10 +55,17 @@ export default function CartDrawer() {
               {lines.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center space-y-4">
                   <div className="rounded-full bg-gray-100 dark:bg-gray-900 p-6">
-                    <ShoppingBag size={48} className="text-gray-400 dark:text-gray-600" />
+                    <ShoppingBag
+                      size={48}
+                      className="text-gray-400 dark:text-gray-600"
+                    />
                   </div>
-                  <p className="text-lg font-medium text-gray-900 dark:text-white">Your cart is empty</p>
-                  <p className="text-gray-500 dark:text-gray-400 text-center">Looks like you haven&apos;t added anything to your cart yet.</p>
+                  <p className="text-lg font-medium text-gray-900 dark:text-white">
+                    Your cart is empty
+                  </p>
+                  <p className="text-gray-500 dark:text-gray-400 text-center">
+                    Looks like you haven&apos;t added anything to your cart yet.
+                  </p>
                   <button
                     onClick={() => setIsCartOpen(false)}
                     className="text-indigo-600 dark:text-indigo-400 font-semibold hover:text-indigo-500 transition-colors cursor-pointer"
@@ -65,7 +74,10 @@ export default function CartDrawer() {
                   </button>
                 </div>
               ) : (
-                <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-800">
+                <ul
+                  role="list"
+                  className="divide-y divide-gray-200 dark:divide-gray-800"
+                >
                   {lines.map((line: ShopifyCartLine) => (
                     <CartItem key={line.id} line={line} />
                   ))}
@@ -80,11 +92,11 @@ export default function CartDrawer() {
                   <p>Subtotal</p>
                   <p>
                     {totalAmount
-                      ? new Intl.NumberFormat('en-US', {
-                          style: 'currency',
+                      ? new Intl.NumberFormat("en-US", {
+                          style: "currency",
                           currency: totalAmount.currencyCode,
                         }).format(parseFloat(totalAmount.amount))
-                      : '$0.00'}
+                      : "$0.00"}
                   </p>
                 </div>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 italic">
@@ -101,7 +113,7 @@ export default function CartDrawer() {
                 </div>
                 <div className="mt-4 flex justify-center text-center text-sm text-gray-500 dark:text-gray-400">
                   <p>
-                    or{' '}
+                    or{" "}
                     <button
                       type="button"
                       className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 transition-colors cursor-pointer"

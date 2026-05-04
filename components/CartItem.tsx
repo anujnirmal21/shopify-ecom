@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { useCartStore } from '../store/cart-store';
-import { Trash2, Plus, Minus } from 'lucide-react';
-import { ShopifyCartLine } from '@/lib/shopify';
+import React, { useState } from "react";
+import Image from "next/image";
+import { useCartStore } from "../store/cart-store";
+import { Trash2, Plus, Minus } from "lucide-react";
+import { ShopifyCartLine } from "@/lib/types";
 
 interface CartItemProps {
   line: ShopifyCartLine;
@@ -33,8 +33,8 @@ export default function CartItem({ line }: CartItemProps) {
     }
   };
 
-  const formattedPrice = new Intl.NumberFormat('en-US', {
-    style: 'currency',
+  const formattedPrice = new Intl.NumberFormat("en-US", {
+    style: "currency",
     currency: line.merchandise.price.currencyCode,
   }).format(parseFloat(line.merchandise.price.amount));
 
@@ -44,7 +44,10 @@ export default function CartItem({ line }: CartItemProps) {
         {line.merchandise.product.featuredImage && (
           <Image
             src={line.merchandise.product.featuredImage.url}
-            alt={line.merchandise.product.featuredImage.altText || line.merchandise.product.title}
+            alt={
+              line.merchandise.product.featuredImage.altText ||
+              line.merchandise.product.title
+            }
             width={100}
             height={100}
             className="h-full w-full object-cover object-center"
@@ -58,7 +61,9 @@ export default function CartItem({ line }: CartItemProps) {
             <h3 className="line-clamp-1">{line.merchandise.product.title}</h3>
             <p className="ml-4">{formattedPrice}</p>
           </div>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{line.merchandise.title}</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {line.merchandise.title}
+          </p>
         </div>
         <div className="flex flex-1 items-end justify-between text-sm">
           <div className="flex items-center space-x-2">

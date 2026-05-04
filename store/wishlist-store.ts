@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { ShopifyProduct } from '../lib/shopify';
+import { ShopifyProduct } from "@/lib/types";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface WishlistState {
   wishlist: ShopifyProduct[];
@@ -26,7 +26,7 @@ export const useWishlistStore = create<WishlistState>()(
       },
     }),
     {
-      name: 'wishlist-storage',
-    }
-  )
+      name: "wishlist-storage",
+    },
+  ),
 );
