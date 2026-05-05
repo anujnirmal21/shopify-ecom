@@ -1,17 +1,24 @@
 import ProductCard from "@/components/ProductCard";
-import { getProducts, getCollections, getCollectionProducts } from "@/lib/shopify";
+import {
+  getCollections,
+  getCollectionProducts,
+  getProducts,
+} from "@/services/product";
+
 import Link from "next/link";
 
 interface ProductsPageProps {
   searchParams: Promise<{ collection?: string }>;
 }
 
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+export default async function ProductsPage({
+  searchParams,
+}: ProductsPageProps) {
   const { collection: collectionHandle } = await searchParams;
-  
+
   let products;
   let title = "All Products";
-  
+
   const collections = await getCollections();
 
   if (collectionHandle) {
@@ -24,37 +31,43 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-border pb-8">
-          <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
+      <div className="mx-auto max-w-[1400px] px-6 py-16 lg:px-12 lg:py-24">
+        {/* Collection Header */}
+        <div className="flex flex-col mb-16 border-b border-border/40 pb-12">
+          <div className="mb-4">
+             <span className="text-primary tracking-[0.3em] text-[10px] font-bold uppercase">
+               Shop The Edit
+             </span>
+          </div>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+            <h1 className="text-5xl md:text-6xl font-serif text-foreground leading-tight">
               {title}
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Showing {products.length} products
+            <p className="text-sm font-light tracking-widest text-muted-foreground uppercase">
+              {products.length} CURATED PIECES
             </p>
           </div>
-          
-          {/* Collection Filter Buttons */}
-          <div className="mt-6 flex flex-wrap gap-2 md:mt-0">
+
+          {/* Collection Filter Links - Minimalist style */}
+          <div className="mt-12 flex flex-wrap gap-x-8 gap-y-4">
             <Link
               href="/products"
-              className={`rounded-full px-4 py-2 text-xs font-semibold transition-all ${
-                !collectionHandle 
-                  ? 'bg-primary text-primary-foreground shadow-md' 
-                  : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              className={`text-[10px] font-bold tracking-[0.2em] uppercase transition-all pb-1 border-b ${
+                !collectionHandle
+                  ? "text-primary border-primary"
+                  : "text-muted-foreground border-transparent hover:text-foreground"
               }`}
             >
-              All
+              All Items
             </Link>
             {collections.map((col) => (
               <Link
                 key={col.id}
                 href={`/products?collection=${col.handle}`}
-                className={`rounded-full px-4 py-2 text-xs font-semibold transition-all ${
-                  collectionHandle === col.handle 
-                    ? 'bg-primary text-primary-foreground shadow-md' 
-                    : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                className={`text-[10px] font-bold tracking-[0.2em] uppercase transition-all pb-1 border-b ${
+                  collectionHandle === col.handle
+                    ? "text-primary border-primary"
+                    : "text-muted-foreground border-transparent hover:text-foreground"
                 }`}
               >
                 {col.title}
@@ -64,11 +77,14 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         </div>
 
         {products.length === 0 ? (
-          <div className="py-24 text-center">
-            <p className="text-muted-foreground text-lg">No products found in this collection.</p>
+          <div className="py-32 text-center">
+            <h2 className="text-2xl font-serif text-muted-foreground mb-4 italic">No pieces found in this edit.</h2>
+            <Link href="/products" className="text-xs font-bold uppercase tracking-widest text-primary border-b border-primary pb-1">
+               Return to All Items
+            </Link>
           </div>
         ) : (
-          <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-x-8 gap-y-20 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

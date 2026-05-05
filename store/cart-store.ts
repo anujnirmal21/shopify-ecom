@@ -1,14 +1,13 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { ShopifyCart, ShopifyCartLine } from "@/lib/types";
 import {
   createCart,
+  updateCartLine,
   addToCart,
   removeFromCart,
   getCart,
-  updateCartLine,
-  ShopifyCart,
-  ShopifyCartLine,
-} from "../lib/shopify";
+} from "@/services/cart";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface CartState {
   cart: ShopifyCart | null;
@@ -55,10 +54,11 @@ export const useCartStore = create<CartState>()(
           if (existingLine && cart) {
             // Optimistic update for existing item
             const newQuantity = existingLine.quantity + quantity;
-            const updatedNodes = cart.lines.nodes.map((line: ShopifyCartLine) =>
-              line.id === existingLine.id
-                ? { ...line, quantity: newQuantity }
-                : line,
+            const updatedNodes = cart.lines.nodes.map(
+              (line: ShopifyCartLine) =>
+                line.id === existingLine.id
+                  ? { ...line, quantity: newQuantity }
+                  : line,
             );
             set({
               cart: { ...cart, lines: { ...cart.lines, nodes: updatedNodes } },
