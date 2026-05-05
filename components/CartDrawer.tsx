@@ -69,15 +69,15 @@ export default function CartDrawer() {
                   <p className="text-xl font-serif italic text-muted-foreground">
                     Your collection is currently empty.
                   </p>
-                  <button
+                  <Link
+                    href="/products"
                     onClick={() => {
                       setIsCartOpen(false);
-                      router.push("/products");
                     }}
                     className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary border-b border-primary pb-1 hover:text-foreground hover:border-foreground transition-all cursor-pointer"
                   >
                     Explore Pieces &rarr;
-                  </button>
+                  </Link>
                 </div>
               ) : (
                 <ul role="list" className="divide-y divide-border/40">
@@ -97,7 +97,10 @@ export default function CartDrawer() {
                   </p>
                   <p className="text-xl font-serif text-foreground">
                     {totalAmount
-                      ? formatPrice(totalAmount.amount, totalAmount.currencyCode)
+                      ? formatPrice(
+                          totalAmount.amount,
+                          totalAmount.currencyCode,
+                        )
                       : "$0.00"}
                   </p>
                 </div>
@@ -112,13 +115,13 @@ export default function CartDrawer() {
                   >
                     Begin Checkout
                   </Link>
-                  <button
-                    type="button"
+                  <Link
+                    href="/products"
                     className="w-full text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/60 hover:text-primary transition-colors cursor-pointer"
                     onClick={() => setIsCartOpen(false)}
                   >
                     Continue Browsing
-                  </button>
+                  </Link>
                 </div>
               </div>
             )}

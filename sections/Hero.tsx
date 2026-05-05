@@ -1,11 +1,28 @@
+"use client";
+
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import React from "react";
+import React, { useRef } from "react";
 
 function HeroSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const scrollToNextSection = () => {
+    if (sectionRef.current) {
+      const height = sectionRef.current.offsetHeight;
+      window.scrollTo({
+        top: height,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
-    <section className="relative h-[90vh] w-full flex items-center justify-center overflow-hidden bg-background">
+    <section 
+      ref={sectionRef}
+      className="relative h-[90vh] w-full flex items-center justify-center overflow-hidden bg-background"
+    >
       {/* Background Layer - Minimalist & Clean */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -53,7 +70,10 @@ function HeroSection() {
       </div>
 
       {/* Scroll Down Option - Minimalist */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer group">
+      <div 
+        onClick={scrollToNextSection}
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer group"
+      >
         <span className="text-[9px] uppercase tracking-[0.4em] text-white/50 group-hover:text-white transition-colors">
           Scroll Down
         </span>
