@@ -1,3 +1,17 @@
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export function formatPrice(amount: string | number, currencyCode: string = "USD") {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currencyCode,
+  }).format(typeof amount === "string" ? parseFloat(amount) : amount);
+}
+
 const domain =
   process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ||
   process.env.SHOPIFY_STORE_DOMAIN;

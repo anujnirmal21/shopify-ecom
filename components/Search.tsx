@@ -6,9 +6,16 @@ import { Search as SearchIcon, X, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShopifyProduct } from "@/lib/types";
+import { cn, formatPrice } from "@/lib/utils";
 import { searchProducts } from "@/services/product";
 
-export default function Search() {
+export default function Search({
+  hideIcon = false,
+  transparent = false,
+}: {
+  hideIcon?: boolean;
+  transparent?: boolean;
+}) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<ShopifyProduct[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -42,7 +49,7 @@ export default function Search() {
   }, [query, handleSearch]);
 
   return (
-    <div className="relative w-full max-w-lg">
+    <div className={cn("relative w-full", !transparent && "max-w-lg")}>
       <div className="relative group">
         <input
           type="text"
@@ -53,11 +60,18 @@ export default function Search() {
           }}
           onFocus={() => setIsOpen(true)}
           placeholder="Search products..."
-          className="w-full rounded-full border border-border bg-muted/20 py-2.5 pl-10 pr-4 text-sm text-foreground focus:border-primary focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-300 placeholder:text-muted-foreground/50"
+          className={cn(
+            "w-full py-2.5 pr-4 text-sm text-foreground focus:outline-none transition-all duration-500 placeholder:text-muted-foreground/40",
+            !transparent &&
+              "rounded-full border border-border bg-muted/20 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20",
+            hideIcon ? (transparent ? "pl-0" : "pl-4") : "pl-10",
+          )}
         />
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
-          <SearchIcon size={18} strokeWidth={1.5} />
-        </div>
+        {!hideIcon && (
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+            <SearchIcon size={18} strokeWidth={1.5} />
+          </div>
+        )}
         {query && (
           <button
             onClick={() => {
@@ -73,7 +87,7 @@ export default function Search() {
       </div>
 
       {isOpen && query.length >= 2 && (
-        <div className="absolute mt-3 w-full overflow-hidden rounded-xl border border-border bg-popover shadow-2xl z-50 animate-in fade-in zoom-in duration-200">
+        <div className="absolute mt-3 sm:-left-[15%] w-full sm:w-[120%] overflow-hidden rounded-xl border border-border bg-popover shadow-2xl z-50 animate-in fade-in zoom-in duration-200">
           {isSearching ? (
             <div className="flex items-center justify-center p-8 text-muted-foreground">
               <Loader2 className="mr-2 animate-spin" size={20} />
@@ -92,27 +106,22 @@ export default function Search() {
                   className="flex items-center space-x-4 p-3 hover:bg-accent/10 transition-colors"
                 >
                   <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-border bg-muted/20">
-                    {product.featuredImage && (
-                      <Image
-                        src={product.featuredImage.url}
-                        alt={product.featuredImage.altText || product.title}
-                        width={48}
-                        height={48}
-                        className="h-full w-full object-cover"
-                      />
-                    )}
+                    <Image
+                      src={product.featuredImage.url}
+                      alt={product.featuredImage.altText || product.title}
+                      width={48}
+                      height={48}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-foreground line-clamp-1">
                       {product.title}
                     </p>
                     <p className="text-xs text-primary font-semibold">
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency:
-                          product.priceRange.minVariantPrice.currencyCode,
-                      }).format(
-                        parseFloat(product.priceRange.minVariantPrice.amount),
+                      {formatPrice(
+                        product.priceRange.minVariantPrice.amount,
+                        product.priceRange.minVariantPrice.currencyCode,
                       )}
                     </p>
                   </div>

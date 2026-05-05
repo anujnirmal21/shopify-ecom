@@ -3,12 +3,17 @@
 import React from "react";
 import { useCartStore } from "../store/cart-store";
 import CartItem from "./CartItem";
+import { useHasMounted } from "../hooks/use-has-mounted";
 import { X, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { ShopifyCartLine } from "@/lib/types";
+import { useRouter } from "next/navigation";
+import { formatPrice } from "@/lib/utils";
 
 export default function CartDrawer() {
   const { cart, isCartOpen, setIsCartOpen, cartId } = useCartStore();
+  const hasMounted = useHasMounted();
+  const router = useRouter();
 
   // Sync cartId to cookie for server-side access (checkout)
   React.useEffect(() => {
@@ -19,8 +24,8 @@ export default function CartDrawer() {
 
   if (!isCartOpen) return null;
 
-  const lines = cart?.lines?.nodes || [];
-  const totalAmount = cart?.cost?.totalAmount;
+  const lines = hasMounted ? cart?.lines?.nodes || [] : [];
+  const totalAmount = hasMounted ? cart?.cost?.totalAmount : null;
 
   return (
     <div className="fixed inset-0 z-50 flex overflow-hidden">
@@ -65,17 +70,17 @@ export default function CartDrawer() {
                     Your collection is currently empty.
                   </p>
                   <button
-                    onClick={() => setIsCartOpen(false)}
+                    onClick={() => {
+                      setIsCartOpen(false);
+                      router.push("/products");
+                    }}
                     className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary border-b border-primary pb-1 hover:text-foreground hover:border-foreground transition-all cursor-pointer"
                   >
                     Explore Pieces &rarr;
                   </button>
                 </div>
               ) : (
-                <ul
-                  role="list"
-                  className="divide-y divide-border/40"
-                >
+                <ul role="list" className="divide-y divide-border/40">
                   {lines.map((line: ShopifyCartLine) => (
                     <CartItem key={line.id} line={line} />
                   ))}
@@ -87,13 +92,12 @@ export default function CartDrawer() {
             {lines.length > 0 && (
               <div className="border-t border-border/40 bg-muted/20 px-6 py-10">
                 <div className="flex justify-between items-baseline mb-2">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Subtotal</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                    Subtotal
+                  </p>
                   <p className="text-xl font-serif text-foreground">
                     {totalAmount
-                      ? new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: totalAmount.currencyCode,
-                        }).format(parseFloat(totalAmount.amount))
+                      ? formatPrice(totalAmount.amount, totalAmount.currencyCode)
                       : "$0.00"}
                   </p>
                 </div>

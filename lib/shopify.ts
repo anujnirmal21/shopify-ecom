@@ -19,6 +19,8 @@ export const GRAPHQL_QUERIES = {
           variants(first: 1) {
             nodes {
               id
+              availableForSale
+              quantityAvailable
             }
           }
         }
@@ -39,6 +41,8 @@ export const GRAPHQL_QUERIES = {
               ... on ProductVariant {
                 id
                 title
+                availableForSale
+                quantityAvailable
                 price {
                   amount
                   currencyCode
@@ -69,8 +73,19 @@ export const GRAPHQL_QUERIES = {
       product(handle: $handle) {
         id
         title
+        handle
         description
         descriptionHtml
+        featuredImage {
+          url
+          altText
+        }
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+        }
         images(first: 10) {
           nodes {
             url
@@ -88,6 +103,7 @@ export const GRAPHQL_QUERIES = {
               currencyCode
             }
             availableForSale
+            quantityAvailable
           }
         }
       }
@@ -109,6 +125,13 @@ export const GRAPHQL_QUERIES = {
               minVariantPrice {
                 amount
                 currencyCode
+              }
+            }
+            variants(first: 1) {
+              nodes {
+                id
+                availableForSale
+                quantityAvailable
               }
             }
           }
@@ -153,6 +176,8 @@ export const GRAPHQL_QUERIES = {
             variants(first: 1) {
               nodes {
                 id
+                availableForSale
+                quantityAvailable
               }
             }
           }

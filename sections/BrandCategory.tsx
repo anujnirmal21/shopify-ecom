@@ -48,7 +48,7 @@ function BrandCategorySection({
           <div className="order-1 md:order-2 grid grid-cols-12 gap-4 h-[600px] md:h-[700px]">
             <div className="relative h-full col-span-7 overflow-hidden translate-y-12">
               <Image
-                src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80"
+                src="https://images.unsplash.com/photo-1622434641406-a158123450f9?q=80&w=704&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Premium Product 1"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -57,7 +57,7 @@ function BrandCategorySection({
             </div>
             <div className="relative h-full col-span-5 overflow-hidden -translate-y-12">
               <Image
-                src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80"
+                src="https://images.unsplash.com/photo-1637868796504-32f45a96d5a0?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGxlYXRoZXIlMjBiYWdzfGVufDB8fDB8fHww"
                 alt="Premium Product 2"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
