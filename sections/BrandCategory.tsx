@@ -1,5 +1,6 @@
 import { ShopifyCollection } from "@/lib/types";
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 
@@ -38,12 +39,9 @@ function BrandCategorySection({
                 </Link>
               ))}
             </div>
-            <Link
-              href="/products"
-              className="inline-flex items-center text-[10px] font-bold uppercase tracking-[0.3em] border-b border-foreground pb-2 hover:text-primary hover:border-primary transition-all"
-            >
-              Explore All Departments <ArrowRight className="ml-3 w-4 h-4" />
-            </Link>
+            <Button href="/products" className="sm:w-auto mt-4">
+              Explore All Departments
+            </Button>
           </div>
           <div className="order-1 md:order-2 grid grid-cols-12 gap-4 h-[600px] md:h-[700px]">
             <div className="relative h-full col-span-7 overflow-hidden translate-y-12">
