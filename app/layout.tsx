@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import CartDrawer from "../components/CartDrawer";
@@ -17,9 +17,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "Shopify Headless Storefront",
-  description: "Built with Next.js and Shopify Storefront API",
+  title: "VANTAGE | Premium Selection",
+  description: "Your ultimate destination for curated premium products across all categories.",
 };
 
 export default function RootLayout({
@@ -28,21 +33,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-        suppressHydrationWarning
-      >
-        <body className="min-h-full flex flex-col transition-colors duration-300">
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-full flex flex-col transition-colors duration-300">
+        <ClerkProvider>
           <ThemeProvider>
             <Navbar />
             <main className="flex-grow">{children}</main>
             <Footer />
             <CartDrawer />
           </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

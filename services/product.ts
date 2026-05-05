@@ -1,5 +1,5 @@
 import { GRAPHQL_QUERIES } from "@/lib/shopify";
-import { ShopifyProduct } from "@/lib/types";
+import { ShopifyCollection, ShopifyProduct } from "@/lib/types";
 import { shopifyFetch } from "@/lib/utils";
 
 export async function getProducts(first = 20): Promise<ShopifyProduct[]> {
@@ -32,14 +32,7 @@ export async function searchProducts(query: string): Promise<ShopifyProduct[]> {
   return res.data.search.nodes;
 }
 
-export async function getCollections(): Promise<
-  {
-    id: string;
-    title: string;
-    handle: string;
-    image?: { url: string; altText?: string };
-  }[]
-> {
+export async function getCollections(): Promise<ShopifyCollection[]> {
   const res = await shopifyFetch<{
     collections: {
       nodes: {

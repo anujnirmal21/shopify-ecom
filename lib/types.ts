@@ -109,3 +109,10 @@ export interface ShopifyUserError {
   field: string[];
   message: string;
 }
+
+export interface ShopifyCollection {
+  id: string;
+  title: string;
+  handle: string;
+  image?: { url: string; altText?: string };
+}

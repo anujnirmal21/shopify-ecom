@@ -40,56 +40,55 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/product/${product.handle}`}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+      className="group relative flex flex-col overflow-hidden bg-background border border-transparent hover:border-border transition-all duration-500"
     >
-      <div className="aspect-h-1 aspect-w-1 bg-gray-100 dark:bg-gray-900 group-hover:opacity-90 transition-opacity relative h-80 overflow-hidden">
+      <div className="aspect-[4/5] bg-muted relative overflow-hidden">
         {product.featuredImage ? (
           <Image
             src={product.featuredImage.url}
             alt={product.featuredImage.altText || product.title}
-            width={400}
-            height={400}
-            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
+            width={600}
+            height={750}
+            className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-gray-50 dark:bg-gray-800 text-gray-400">
-            No image
+          <div className="flex h-full items-center justify-center bg-muted text-muted-foreground font-light tracking-widest text-xs uppercase">
+            Product Image
           </div>
         )}
 
         {/* Actions Overlay */}
-        <div className="absolute top-4 right-4 flex flex-col space-y-2 opacity-0 transform translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+        <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={handleToggleWishlist}
-            className={`p-2 rounded-full shadow-lg backdrop-blur-md transition-all cursor-pointer ${
+            className={`p-2 rounded-full backdrop-blur-sm transition-all duration-300 ${
               isWishlisted
-                ? "bg-red-500 text-white hover:bg-red-600 border-transparent"
-                : "bg-white/80 dark:bg-gray-950/80 text-gray-900 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700"
-            } border`}
+                ? "bg-primary text-primary-foreground"
+                : "bg-black/20 text-white hover:bg-black/40"
+            }`}
           >
-            <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} />
+            <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} strokeWidth={1.5} />
+          </button>
+        </div>
+
+        {/* Quick Add Button */}
+        <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-10">
+          <button
+            onClick={handleAddToCart}
+            className="w-full bg-primary text-primary-foreground py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-colors"
+          >
+            Quick Add To Cart
           </button>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <div className="mb-2">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-            {product.title}
-          </h3>
-        </div>
-
-        <div className="mt-auto flex items-center justify-between">
-          <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
-            {formattedPrice}
-          </p>
-          <button
-            onClick={handleAddToCart}
-            className="p-2.5 rounded-lg bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer"
-          >
-            <ShoppingCart size={18} />
-          </button>
-        </div>
+      <div className="flex flex-col pt-6 pb-2">
+        <h3 className="text-sm font-light tracking-wide text-foreground mb-2 group-hover:text-primary transition-colors">
+          {product.title}
+        </h3>
+        <p className="text-sm font-serif italic text-muted-foreground">
+          {formattedPrice}
+        </p>
       </div>
     </Link>
   );
