@@ -58,16 +58,24 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
 
         {/* Actions Overlay */}
-        <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
           <button
             onClick={handleToggleWishlist}
-            className={`p-2 rounded-full backdrop-blur-sm transition-all duration-300 ${
+            className={`p-1.5 rounded-full backdrop-blur-md transition-all duration-500 border cursor-pointer ${
               isWishlisted
-                ? "bg-primary text-primary-foreground"
-                : "bg-black/20 text-white hover:bg-black/40"
+                ? "bg-gray-200/30 border-gray-200 text-primary shadow-xl shadow-red-500/10 scale-110"
+                : "bg-black/20 border-white/10 text-white hover:bg-black/40 hover:scale-110"
             }`}
+            aria-label={
+              isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+            }
           >
-            <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} strokeWidth={1.5} />
+            <Heart
+              size={18}
+              fill={isWishlisted ? "currentColor" : "none"}
+              strokeWidth={isWishlisted ? 0 : 1.5}
+              className="transition-transform duration-300 active:scale-125"
+            />
           </button>
         </div>
 
