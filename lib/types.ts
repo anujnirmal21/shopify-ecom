@@ -4,7 +4,7 @@ export interface ShopifyProduct {
   handle: string;
   description?: string;
   descriptionHtml?: string;
-  featuredImage?: {
+  featuredImage: {
     url: string;
     altText?: string;
   };
@@ -35,6 +35,7 @@ export interface ShopifyProductVariant {
     currencyCode: string;
   };
   availableForSale: boolean;
+  quantityAvailable?: number;
 }
 
 export interface ShopifyCart {
