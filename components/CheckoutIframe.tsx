@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Loader2, CheckCircle2, ExternalLink, RefreshCcw, ShieldCheck, Lock, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  CheckCircle2,
+  ExternalLink,
+  RefreshCcw,
+  ShieldCheck,
+  Lock,
+  AlertCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart-store";
@@ -14,50 +22,61 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
   const [isChecking, setIsChecking] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const router = useRouter();
-  
+
   const clearCart = useCartStore((state) => state.clearCart);
   const cartId = useCartStore((state) => state.cartId);
-  
+
   const popupRef = useRef<Window | null>(null);
   const hasOpenedRef = useRef(false);
 
-  const checkStatus = useCallback(async (manual = false) => {
-    if (!cartId) return;
-    
-    if (manual) setIsChecking(true);
-    
-    try {
-      const currentCart = await getCart(cartId);
-      
-      const isCartEmpty = !currentCart || (currentCart.lines?.nodes?.length === 0);
-      
-      if (isCartEmpty) {
-        if (popupRef.current) {
-          try { popupRef.current.close(); } catch (err) { console.warn(err); }
+  const checkStatus = useCallback(
+    async (manual = false) => {
+      if (!cartId) return;
+
+      if (manual) setIsChecking(true);
+
+      try {
+        const currentCart = await getCart(cartId);
+
+        const isCartEmpty =
+          !currentCart || currentCart.lines?.nodes?.length === 0;
+
+        if (isCartEmpty) {
+          if (popupRef.current) {
+            try {
+              popupRef.current.close();
+            } catch (err) {
+              console.warn(err);
+            }
+          }
+
+          setIsCompleted(true);
+          toast.success("Purchase Successful!", {
+            description:
+              "Thank you for your order. Your cart has been cleared.",
+          });
+
+          if (clearCart) clearCart();
+          document.cookie =
+            "cartId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+          setTimeout(() => {
+            router.push("/");
+          }, 5000);
+        } else if (manual) {
+          toast.info("Still Processing", {
+            description:
+              "Payment not yet confirmed. Please finish in the checkout window.",
+          });
         }
-
-        setIsCompleted(true);
-        toast.success("Purchase Successful!", {
-          description: "Thank you for your order. Your cart has been cleared.",
-        });
-        
-        if (clearCart) clearCart();
-        document.cookie = "cartId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-
-        setTimeout(() => {
-          router.push("/");
-        }, 5000);
-      } else if (manual) {
-        toast.info("Still Processing", {
-          description: "Payment not yet confirmed. Please finish in the checkout window.",
-        });
+      } catch (error) {
+        console.error("[Checkout] Error during status check:", error);
+      } finally {
+        if (manual) setIsChecking(false);
       }
-    } catch (error) {
-      console.error("[Checkout] Error during status check:", error);
-    } finally {
-      if (manual) setIsChecking(false);
-    }
-  }, [cartId, clearCart, router]);
+    },
+    [cartId, clearCart, router],
+  );
 
   const openCheckoutPopup = useCallback(() => {
     const width = 600;
@@ -68,7 +87,7 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
     const popup = window.open(
       checkoutUrl,
       "ShopifyCheckout",
-      `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no`
+      `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no`,
     );
 
     if (!popup || popup.closed || typeof popup.closed === "undefined") {
@@ -95,7 +114,7 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
     };
 
     window.addEventListener("message", handleMessage);
-    
+
     const pollInterval = setInterval(() => {
       if (!isCompleted && cartId) {
         checkStatus();
@@ -116,16 +135,19 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
           <CheckCircle2 className="h-12 w-12 text-primary" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-3xl font-serif text-foreground">Order Confirmed</h1>
+          <h1 className="text-3xl font-serif text-foreground">
+            Order Confirmed
+          </h1>
           <p className="text-muted-foreground max-w-md mx-auto text-sm">
-            Your purchase was successful. We've sent a confirmation email to your inbox.
+            Your purchase was successful. We've sent a confirmation email to
+            your inbox.
           </p>
         </div>
-        <button 
-          onClick={() => router.push("/")}
+        <button
+          onClick={() => router.push("/profile")}
           className="bg-primary text-primary-foreground px-10 py-4 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white hover:text-black transition-all border border-primary shadow-lg"
         >
-          Continue Shopping
+          View Orders
         </button>
       </div>
     );
@@ -133,17 +155,20 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[75vh] px-6 text-center">
-      <div className={cn(
-        "max-w-md w-full space-y-8 p-10 bg-muted/5 border border-border/40 rounded-3xl backdrop-blur-xl transition-all duration-700",
-        isInitializing ? "opacity-50 scale-95" : "opacity-100 scale-100"
-      )}>
-        
+      <div
+        className={cn(
+          "max-w-md w-full space-y-8 p-10 bg-muted/5 border border-border/40 rounded-3xl backdrop-blur-xl transition-all duration-700",
+          isInitializing ? "opacity-50 scale-95" : "opacity-100 scale-100",
+        )}
+      >
         {isInitializing && (
           <div className="space-y-6 py-4">
             <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto opacity-50" />
             <div className="space-y-2">
               <h2 className="text-xl font-serif">Preparing Gateway</h2>
-              <p className="text-muted-foreground text-[10px] uppercase tracking-widest font-bold">Securing your transaction...</p>
+              <p className="text-muted-foreground text-[10px] uppercase tracking-widest font-bold">
+                Securing your transaction...
+              </p>
             </div>
           </div>
         )}
@@ -156,7 +181,8 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
               </div>
               <h2 className="text-2xl font-serif">Proceed to Payment</h2>
               <p className="text-muted-foreground text-sm leading-relaxed px-4">
-                To keep your transaction secure, our payment gateway opens in a focused window. Please click below to continue.
+                To keep your transaction secure, our payment gateway opens in a
+                focused window. Please click below to continue.
               </p>
             </div>
 
@@ -168,11 +194,14 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
                 }}
                 className="w-full flex items-center justify-center space-x-3 bg-primary text-primary-foreground h-16 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white hover:text-black transition-all border border-primary shadow-xl shadow-primary/10 group"
               >
-                <Lock size={14} className="group-hover:text-primary transition-colors" />
+                <Lock
+                  size={14}
+                  className="group-hover:text-primary transition-colors"
+                />
                 <span>Open Secure Window</span>
                 <ExternalLink size={14} className="opacity-50" />
               </button>
-              
+
               <div className="flex items-center justify-center gap-2 text-[9px] text-muted-foreground uppercase tracking-widest bg-muted/30 py-2 rounded-full">
                 <AlertCircle size={10} />
                 <span>Browser popup permission may be required</span>
@@ -192,7 +221,8 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
               </div>
               <h2 className="text-2xl font-serif">Verification in Progress</h2>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Please finalize your payment in the separate checkout window. This page will update automatically.
+                Please finalize your payment in the separate checkout window.
+                This page will update automatically.
               </p>
             </div>
 
@@ -202,10 +232,18 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
                 disabled={isChecking}
                 className="w-full flex items-center justify-center space-x-2 border border-primary/20 bg-background text-foreground h-16 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-primary hover:text-primary-foreground transition-all disabled:opacity-50 group"
               >
-                <RefreshCcw size={14} className={cn("group-hover:rotate-180 transition-transform duration-500", isChecking && "animate-spin")} />
-                <span>{isChecking ? "Verifying..." : "Confirm My Purchase"}</span>
+                <RefreshCcw
+                  size={14}
+                  className={cn(
+                    "group-hover:rotate-180 transition-transform duration-500",
+                    isChecking && "animate-spin",
+                  )}
+                />
+                <span>
+                  {isChecking ? "Verifying..." : "Confirm My Purchase"}
+                </span>
               </button>
-              
+
               <div className="text-[9px] uppercase tracking-[0.4em] text-primary font-bold animate-pulse">
                 Awaiting Gateway Confirmation
               </div>
@@ -225,7 +263,9 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
 
       <div className="mt-10 flex items-center space-x-4 text-muted-foreground/30">
         <div className="h-px w-12 bg-current" />
-        <span className="text-[8px] uppercase tracking-[0.4em] font-bold">256-Bit SSL Encryption</span>
+        <span className="text-[8px] uppercase tracking-[0.4em] font-bold">
+          256-Bit SSL Encryption
+        </span>
         <div className="h-px w-12 bg-current" />
       </div>
     </div>
