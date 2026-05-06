@@ -22,7 +22,7 @@ function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[90vh] w-full flex items-center justify-center overflow-hidden bg-background"
+      className="relative h-[75vh] sm:h-[90vh] w-full flex items-center justify-center overflow-hidden bg-background"
     >
       {/* Background Layer - Minimalist & Clean */}
       <div className="absolute inset-0 z-0">
