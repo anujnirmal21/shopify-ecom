@@ -19,9 +19,10 @@ interface CartState {
   updateQuantity: (lineId: string, quantity: number) => Promise<void>;
   refreshCart: () => Promise<void>;
   checkout: () => void;
-}
+  clearCart: () => void;
+  }
 
-export const useCartStore = create<CartState>()(
+  export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       cart: null,
@@ -29,15 +30,22 @@ export const useCartStore = create<CartState>()(
       cartId: null,
       setIsCartOpen: (open) => set({ isCartOpen: open }),
 
+      clearCart: () => set({ cart: null, cartId: null }),
+  // ...
+
       checkout: () => {
         const cart = get().cart;
         if (cart?.checkoutUrl) {
           window.location.href = cart.checkoutUrl;
         }
       },
+addItem: async (variantId: string, quantity: number = 1) => {
+  // Open the cart immediately for instant feedback
+  set({ isCartOpen: true });
 
-      addItem: async (variantId: string, quantity: number = 1) => {
-        let currentCartId = get().cartId;
+  let currentCartId = get().cartId;
+// ...
+
         if (!currentCartId) {
           const newCart = await createCart();
           currentCartId = newCart.id;

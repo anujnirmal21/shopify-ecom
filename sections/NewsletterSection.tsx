@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/Button";
 
 function NewsletterSection() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -12,14 +14,14 @@ function NewsletterSection() {
     if (!email) return;
 
     setStatus("loading");
-    
+
     // Simulate subscription delay
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       setStatus("success");
       setMessage("Welcome to the circle. Check your inbox soon.");
       setEmail("");
-      
+
       // Reset status after 5 seconds
       setTimeout(() => {
         setStatus("idle");
@@ -43,7 +45,7 @@ function NewsletterSection() {
         </h2>
 
         {/* Improved Form Container */}
-        <form 
+        <form
           onSubmit={handleSubmit}
           className="mt-12 flex flex-col sm:flex-row items-stretch gap-0 bg-black/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 rounded-sm focus-within:border-primary/50 transition-all duration-500 max-w-2xl mx-auto group backdrop-blur-sm relative"
         >
@@ -61,7 +63,7 @@ function NewsletterSection() {
             type="submit"
             isLoading={status === "loading"}
             disabled={status === "success"}
-            className="sm:w-auto"
+            className="sm:w-auto cursor-pointer"
           >
             {status === "success" ? "Subscribed" : "Subscribe"}
           </Button>
@@ -70,9 +72,13 @@ function NewsletterSection() {
         {/* Status Message */}
         <div className="h-6 mt-6 overflow-hidden">
           {message && (
-            <p className={`text-[10px] tracking-[0.3em] uppercase animate-slide-up ${
-              status === "error" ? "text-destructive" : "text-primary dark:text-accent"
-            }`}>
+            <p
+              className={`text-[10px] tracking-[0.3em] uppercase animate-slide-up ${
+                status === "error"
+                  ? "text-destructive"
+                  : "text-primary dark:text-accent"
+              }`}
+            >
               {message}
             </p>
           )}

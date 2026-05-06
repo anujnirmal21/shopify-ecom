@@ -58,6 +58,7 @@ export async function getCart(cartId: string): Promise<ShopifyCart | null> {
   const res = await shopifyFetch<{ cart: ShopifyCart }>({
     query: GRAPHQL_QUERIES.GET_CART,
     variables: { cartId },
+    cache: "no-store",
   });
   return res.data.cart;
 }

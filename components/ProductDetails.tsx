@@ -8,6 +8,7 @@ import { useHasMounted } from "../hooks/use-has-mounted";
 import { ShopifyProduct, ShopifyProductVariant } from "@/lib/types";
 import { Minus, Plus, ShoppingBag, Heart } from "lucide-react";
 import { cn, formatPrice } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface ProductDetailsProps {
   product: ShopifyProduct;
@@ -61,13 +62,17 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       return;
     }
 
-    setIsAdding(true);
+    // setIsAdding(true); // Remove to make it feel instant
     try {
-      await addItem(selectedVariant.id, quantity);
+      addItem(selectedVariant.id, quantity); // Don't await for instant feel
+      toast.success("Added to Selection", {
+        description: `${product.title} has been added to your cart.`,
+      });
     } catch (error) {
       console.error("Failed to add to cart:", error);
+      toast.error("Failed to add to cart");
     } finally {
-      setIsAdding(false);
+      // setIsAdding(false);
     }
   };
 
