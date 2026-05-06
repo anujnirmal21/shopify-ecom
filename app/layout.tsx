@@ -6,6 +6,9 @@ import CartDrawer from "../components/CartDrawer";
 import { ClerkProvider } from "@clerk/nextjs";
 import ThemeProvider from "@/components/ThemeProvider";
 import Footer from "@/components/Footer";
+import { ThemeAwareToaster } from "@/components/ThemeAwareToaster";
+import { ShopifyAuthSync } from "@/components/ShopifyAuthSync";
+import { CartInitializer } from "@/components/CartInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,10 +44,13 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col transition-colors duration-300">
         <ClerkProvider>
           <ThemeProvider>
+            <ShopifyAuthSync />
+            <CartInitializer />
             <Navbar />
             <main className="flex-grow">{children}</main>
             <Footer />
             <CartDrawer />
+            <ThemeAwareToaster position="top-center" />
           </ThemeProvider>
         </ClerkProvider>
       </body>

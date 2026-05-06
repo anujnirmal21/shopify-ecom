@@ -4,14 +4,14 @@ import React from "react";
 import { useCartStore } from "../store/cart-store";
 import CartItem from "./CartItem";
 import { useHasMounted } from "../hooks/use-has-mounted";
-import { X, ShoppingBag } from "lucide-react";
+import { X, ShoppingBag, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { ShopifyCartLine } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
 
 export default function CartDrawer() {
-  const { cart, isCartOpen, setIsCartOpen, cartId } = useCartStore();
+  const { cart, isCartOpen, setIsCartOpen, cartId, isLoading } = useCartStore();
   const hasMounted = useHasMounted();
   const router = useRouter();
 
@@ -44,9 +44,17 @@ export default function CartDrawer() {
                 <span className="text-[10px] tracking-[0.3em] text-primary font-bold uppercase mb-1">
                   Your Selection
                 </span>
-                <h2 className="text-2xl font-serif text-foreground">
-                  Shopping Cart
-                </h2>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-2xl font-serif text-foreground">
+                    Shopping Cart
+                  </h2>
+                  {isLoading && (
+                    <Loader2
+                      size={16}
+                      className="animate-spin text-primary opacity-60"
+                    />
+                  )}
+                </div>
               </div>
               <button
                 type="button"
@@ -59,7 +67,7 @@ export default function CartDrawer() {
 
             {/* Cart Items */}
             <div className="flex-1 overflow-y-auto px-6 py-8">
-              {lines.length === 0 ? (
+              {lines.length === 0 && !isLoading ? (
                 <div className="flex h-full flex-col items-center justify-center space-y-6 text-center">
                   <ShoppingBag
                     size={40}
@@ -79,6 +87,12 @@ export default function CartDrawer() {
                     Explore Pieces &rarr;
                   </Link>
                 </div>
+              ) : lines.length === 0 && isLoading ? (
+                <div className="flex h-full flex-col items-center justify-center space-y-4">
+                  <p className="text-[10px] italic text-primary tracking-widest font-bold animate-pulse">
+                    almost there...
+                  </p>
+                </div>
               ) : (
                 <ul role="list" className="divide-y divide-border/40">
                   {lines.map((line: ShopifyCartLine) => (
@@ -95,14 +109,22 @@ export default function CartDrawer() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                     Subtotal
                   </p>
-                  <p className="text-xl font-serif text-foreground">
-                    {totalAmount
-                      ? formatPrice(
-                          totalAmount.amount,
-                          totalAmount.currencyCode,
-                        )
-                      : "$0.00"}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    {isLoading && (
+                      <Loader2
+                        size={12}
+                        className="animate-spin text-primary opacity-40"
+                      />
+                    )}
+                    <p className="text-xl font-serif text-foreground">
+                      {totalAmount
+                        ? formatPrice(
+                            totalAmount.amount,
+                            totalAmount.currencyCode,
+                          )
+                        : "$0.00"}
+                    </p>
+                  </div>
                 </div>
                 <p className="text-[10px] text-muted-foreground tracking-widest uppercase mb-8">
                   Excluding shipping & taxes.

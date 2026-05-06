@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { getCart } from "@/services/cart";
 import { updateCartBuyerIdentity } from "@/services/customer";
+import { CheckoutIframe } from "@/components/CheckoutIframe";
 
 export default async function CheckoutPage() {
   const user = await currentUser();
@@ -69,8 +70,8 @@ export default async function CheckoutPage() {
   const finalCart = identityResult.cart || (await getCart(cartId));
 
   if (finalCart?.checkoutUrl) {
-    console.log(`[Checkout] Redirecting to: ${finalCart.checkoutUrl}`);
-    redirect(finalCart.checkoutUrl);
+    console.log(`[Checkout] Loading iframe for: ${finalCart.checkoutUrl}`);
+    return <CheckoutIframe checkoutUrl={finalCart.checkoutUrl} />;
   }
 
   console.error(`[Checkout] Could not determine checkout URL.`);

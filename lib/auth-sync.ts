@@ -110,10 +110,10 @@ export async function syncWithShopify(clerkUser: {
     return { success: false, error: "CUSTOMER_DISABLED" };
   }
 
-  if (authResult.customerAccessToken) {
+    if (authResult.customerAccessToken) {
     const { accessToken, expiresAt } = authResult.customerAccessToken;
 
-    // 4. Store the token in a secure, httpOnly cookie
+    // Store the token in a secure, httpOnly cookie if possible
     try {
       cookieStore.set("shopify_customer_token", accessToken, {
         expires: new Date(expiresAt),
@@ -123,15 +123,12 @@ export async function syncWithShopify(clerkUser: {
         path: "/",
       });
     } catch {
-      // Silence error if called during render. The token is still returned
-      // so the current request can proceed.
-      console.debug(
-        "[auth-sync] Cookie could not be set (likely called during render). " +
-          "Token will be used for current request only.",
-      );
+      // In Next.js, cookies() can only be modified in Server Actions or Route Handlers.
+      // If this is called during a page render, we return the token so the caller can
+      // handle it (e.g., via a client-side sync).
     }
 
-    return { success: true, accessToken };
+    return { success: true, accessToken, expiresAt };
   }
 
   return {
