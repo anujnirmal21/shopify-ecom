@@ -28,26 +28,54 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
 
   const popupRef = useRef<Window | null>(null);
   const hasOpenedRef = useRef(false);
+  const redirectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const checkStatus = useCallback(
     async (manual = false) => {
-      if (!cartId) return;
+      if (!cartId) {
+        console.log("[Checkout] No cartId found, skipping status check");
+        return;
+      }
 
       if (manual) setIsChecking(true);
 
       try {
+        console.log("[Checkout] Checking cart status for:", cartId);
         const currentCart = await getCart(cartId);
 
         const isCartEmpty =
           !currentCart || currentCart.lines?.nodes?.length === 0;
 
+        console.log("[Checkout] Cart status:", {
+          exists: !!currentCart,
+          lineCount: currentCart?.lines?.nodes?.length || 0,
+          isCartEmpty,
+        });
+
         if (isCartEmpty) {
+          console.log(
+            "[Checkout] Success detected! Closing popup and updating state.",
+          );
+
           if (popupRef.current) {
             try {
+              console.log("[Checkout] Attempting to close popup window");
               popupRef.current.close();
+              // Check if it actually closed
+              if (popupRef.current.closed) {
+                console.log("[Checkout] Popup window successfully closed");
+              } else {
+                console.warn(
+                  "[Checkout] Popup window close() called but window.closed is still false",
+                );
+              }
             } catch (err) {
-              console.warn(err);
+              console.error("[Checkout] Failed to close popup window:", err);
             }
+          } else {
+            console.warn(
+              "[Checkout] Success detected but popupRef.current is null",
+            );
           }
 
           setIsCompleted(true);
@@ -60,9 +88,12 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
           document.cookie =
             "cartId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 
-          setTimeout(() => {
-            router.push("/");
-          }, 5000);
+          if (redirectTimeoutRef.current) {
+            clearTimeout(redirectTimeoutRef.current);
+          }
+          redirectTimeoutRef.current = setTimeout(() => {
+            router.push("/profile");
+          }, 10000);
         } else if (manual) {
           toast.info("Still Processing", {
             description:
@@ -79,11 +110,18 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
   );
 
   const openCheckoutPopup = useCallback(() => {
+    if (hasOpenedRef.current && popupRef.current && !popupRef.current.closed) {
+      console.log("[Checkout] Popup already open, focusing it");
+      popupRef.current.focus();
+      return true;
+    }
+
     const width = 600;
     const height = 800;
     const left = window.screenX + (window.outerWidth - width) / 2;
     const top = window.screenY + (window.outerHeight - height) / 2;
 
+    console.log("[Checkout] Opening checkout popup:", checkoutUrl);
     const popup = window.open(
       checkoutUrl,
       "ShopifyCheckout",
@@ -91,9 +129,11 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
     );
 
     if (!popup || popup.closed || typeof popup.closed === "undefined") {
+      console.error("[Checkout] Popup was blocked or failed to open");
       setPopupBlocked(true);
       return false;
     } else {
+      console.log("[Checkout] Popup opened successfully");
       setPopupBlocked(false);
       popupRef.current = popup;
       hasOpenedRef.current = true;
@@ -102,29 +142,50 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
   }, [checkoutUrl]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const success = openCheckoutPopup();
+    // Only attempt to open if not completed and not already opened
+    if (isCompleted) return;
+
+    let timer: NodeJS.Timeout;
+
+    if (!hasOpenedRef.current) {
+      timer = setTimeout(() => {
+        openCheckoutPopup();
+        setIsInitializing(false);
+      }, 800);
+    } else {
       setIsInitializing(false);
-    }, 800);
+    }
 
     const handleMessage = (event: MessageEvent) => {
+      // Shopify checkout doesn't usually send postMessage, but keeping for compatibility
       if (event.data?.type === "SHOPIFY_CHECKOUT_SUCCESS") {
+        console.log("[Checkout] Received SHOPIFY_CHECKOUT_SUCCESS message");
         checkStatus();
       }
     };
 
     window.addEventListener("message", handleMessage);
 
+    // Faster polling for better "immediate" feel
     const pollInterval = setInterval(() => {
       if (!isCompleted && cartId) {
         checkStatus();
       }
-    }, 2000);
+
+      // If the popup was closed manually by the user, we should also check one last time
+      if (popupRef.current && popupRef.current.closed && !isCompleted) {
+        console.log("[Checkout] Popup closed manually, verifying final status");
+        checkStatus();
+      }
+    }, 1000);
 
     return () => {
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
       window.removeEventListener("message", handleMessage);
       clearInterval(pollInterval);
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
     };
   }, [openCheckoutPopup, checkStatus, isCompleted, cartId]);
 
@@ -144,8 +205,13 @@ export function CheckoutIframe({ checkoutUrl }: { checkoutUrl: string }) {
           </p>
         </div>
         <button
-          onClick={() => router.push("/profile")}
-          className="bg-primary text-primary-foreground px-10 py-4 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white hover:text-black transition-all border border-primary shadow-lg"
+          onClick={() => {
+            if (redirectTimeoutRef.current) {
+              clearTimeout(redirectTimeoutRef.current);
+            }
+            window.location.href = "/profile";
+          }}
+          className="bg-primary text-primary-foreground px-10 py-4 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white hover:text-black transition-all border border-primary shadow-lg cursor-pointer"
         >
           View Orders
         </button>
