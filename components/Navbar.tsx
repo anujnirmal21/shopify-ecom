@@ -12,11 +12,12 @@ import {
   Search as SearchIcon,
   X,
   ChevronRight,
+  LogOut,
 } from "lucide-react";
 import Search from "./Search";
 import { cn } from "@/lib/utils";
 import { useHasMounted } from "../hooks/use-has-mounted";
-import { SignInButton, UserButton, Show } from "@clerk/nextjs";
+import { SignInButton, UserButton, Show, SignOutButton } from "@clerk/nextjs";
 import ThemeToggle from "./ThemeToggle";
 
 // --- Sub-components ---
@@ -174,6 +175,11 @@ const NavActions = ({
               labelIcon={<User size={14} />}
               href="/profile"
             />
+            <UserButton.Link
+              label="My Orders"
+              labelIcon={<ShoppingBag size={14} />}
+              href="/profile#orders"
+            />
           </UserButton.MenuItems>
         </UserButton>
       </Show>
@@ -226,12 +232,12 @@ const MobileMenu = ({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-10">
+      <div className="flex-1 overflow-y-auto px-6 py-10 space-y-8">
         <Link
           href="/wishlist"
           onClick={onClose}
           className={cn(
-            "mt-2 flex items-center gap-4 text-foreground/70 hover:text-accent transition-colors duration-500 transform",
+            "flex items-center gap-4 text-foreground/70 hover:text-accent transition-colors duration-500 transform",
             isOpen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0",
           )}
           style={{ transitionDelay: "450ms" }}
@@ -241,6 +247,23 @@ const MobileMenu = ({
             My Wishlist ({wishlistCount})
           </span>
         </Link>
+
+        <Show when={"signed-in"}>
+          <Link
+            href="/profile#orders"
+            onClick={onClose}
+            className={cn(
+              "flex items-center gap-4 text-foreground/70 hover:text-accent transition-colors duration-500 transform",
+              isOpen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0",
+            )}
+            style={{ transitionDelay: "500ms" }}
+          >
+            <ShoppingBag size={22} strokeWidth={1.25} />
+            <span className="text-sm font-medium tracking-widest uppercase">
+              My Orders
+            </span>
+          </Link>
+        </Show>
       </div>
 
       <div className="p-6 bg-muted/30 border-t border-border/30 space-y-6">
@@ -251,7 +274,7 @@ const MobileMenu = ({
           <ThemeToggle />
         </div>
 
-        <div>
+        <div className="space-y-3">
           <Show when={"signed-out"}>
             <SignInButton mode="modal">
               <button className="w-full py-4 bg-foreground text-background text-[11px] font-bold tracking-[0.3em] uppercase rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors duration-300">
@@ -280,6 +303,15 @@ const MobileMenu = ({
                 className="text-muted-foreground group-hover:text-accent"
               />
             </Link>
+
+            <SignOutButton>
+              <button className="flex items-center justify-center gap-2 w-full py-4 px-5 bg-muted/50 text-foreground/70 hover:text-destructive hover:bg-destructive/10 transition-all rounded-sm group border border-border/50">
+                <LogOut size={16} strokeWidth={1.5} />
+                <span className="text-[10px] font-bold tracking-[0.3em] uppercase">
+                  Sign Out
+                </span>
+              </button>
+            </SignOutButton>
           </Show>
         </div>
       </div>

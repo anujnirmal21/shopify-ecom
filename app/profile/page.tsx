@@ -181,7 +181,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* Right Column: Order History */}
-          <div className="lg:col-span-2">
+          <div id="orders" className="lg:col-span-2">
             <div className="bg-card shadow-sm sm:rounded-2xl border border-border overflow-hidden min-h-[400px]">
               <div className="px-6 py-5 border-b border-border flex items-center justify-between bg-muted/30">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
